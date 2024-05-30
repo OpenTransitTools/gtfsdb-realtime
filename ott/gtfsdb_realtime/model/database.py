@@ -43,7 +43,7 @@ class Database(object):
         :see http://docs.sqlalchemy.org/en/latest/orm/contextual.html?highlight=scoped%20session :
         :see https://www.programcreek.com/python/example/97518/zope.sqlalchemy.ZopeTransactionExtension :
         """
-        self.session_factory = sessionmaker(bind=self.engine, extension=extension)
+        self.session_factory = sessionmaker(bind=self.engine)
         self.Session = scoped_session(self.session_factory)
 
     @classmethod
