@@ -50,12 +50,22 @@ class Database(object):
     def make_session(cls, url, schema, is_geospatial=False, create_db=False, prep_gtfsdb=True):
         if cls.db_singleton is None:
             cls.db_singleton = Database(url, schema, is_geospatial)
-            if create_db:
-                cls.db_singleton.create()
-            if prep_gtfsdb:
-                import gtfsdb
-                gtfsdb.Database.prep_gtfsdb_model_classes(schema, is_geospatial)
+
+        # FP 2024: this is a bit hacky of a solution to running code with multiple agencies
+        #          oritinally, this was all under the singleton crap above .... added the schema hackery line below too
+        cls.db_singleton.schema = schema
+        if create_db:
+            cls.db_singleton.create()
+        if prep_gtfsdb:
+            import gtfsdb
+            gtfsdb.Database.prep_gtfsdb_model_classes(schema, is_geospatial)
         return cls.db_singleton.session
+
+    @classmethod
+    def close_session(cls, session):
+        if session:
+            session.close()
+        cls.db_singleton = None
 
     @property
     def is_geospatial(self):

@@ -52,7 +52,6 @@ class Vehicle(Base):
             self.set_attributes(data.vehicle)
 
     def set_attributes(self, data):
-
         self.lat = round(data.position.latitude,  6)
         self.lon = round(data.position.longitude, 6)
         if hasattr(self, 'geom'):

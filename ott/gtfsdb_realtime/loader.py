@@ -161,14 +161,19 @@ def load_feeds_via_config(feed, db_url, do_trips=True, do_alerts=True, do_vehicl
     vehicles_url = gtfs_utils.get_realtime_vehicles_url(feed) if do_vehicles else None
 
     # step 3: load them there gtfs-rt feeds
+    # import pdb; pdb.set_trace()
+    session = Database.make_session(db_url, schema, is_geospatial, create_db)
     try:
         log.info("loading gtfsdb_realtime db {} {}".format(db_url, schema))
-        session = Database.make_session(db_url, schema, is_geospatial, create_db)
         ret_val = load_agency_feeds(session, agency_id, trips_url, alerts_url, vehicles_url, "DO NB", durr, freq)
-
     except Exception as e:
         log.error("DATABASE ERROR : {}".format(e))
         ret_val = False
+    finally:
+        # note - when loading multiple feeds, closing then opening new session messes up 2nd agency / schema load with this exeption
+        #        sqlalchemy.exc.InvalidRequestError: Implicitly combining column (py so messy, bro?)
+        # Database.close_session(session)
+        session = None
 
     return ret_val
 
